@@ -11,7 +11,7 @@ import moment from 'moment';
 const { Option } = Select;
 
 const SearchForm=()=> {
-  const {availablebuses,routesFrom,setRoutesFrom,routesTo,setRoutesTo} =useContext(DataContext)
+  const {routesFrom,setRoutesFrom,routesTo,setRoutesTo,setBuses,setSearchFlag} =useContext(DataContext)
   const [form] = Form.useForm();
   const [sourceOptions, setSourceOptions] = useState([]);
   const [destinationOptions, setDestinationOptions] = useState([]);
@@ -70,14 +70,15 @@ useEffect(() => {
       try{
         const response = await axios.get(BASE_URL+`bus/searchbus/${source}/${destination}/${date}/${type}`);
 
-        let buses=response.data;
-        availablebuses(buses);
+        // let buses=response.data;
+        setBuses(response.data)
       }
       catch(err){
-        console.log(err);
+        setBuses([])
+        console.log("error during bus fetch",err);
       }
     }
-
+    setSearchFlag(true);
     getBuses();
   };
 

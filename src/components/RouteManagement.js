@@ -23,9 +23,9 @@ const RouteManagement = () => {
     try {
       const response = await axios.get(`${BASE_URL}/route/getall`);
       console.log("Route Details",response.data)
-      setRoutes(response.data.map((route) => ({ ...route, key: route.id }))); // Map data to include key for Ant Design
+      setRoutes(response.data.map((route) => ({ ...route, key: route.id })));
     } catch (error) {
-      message.error("Error fetching routes.");
+      message.error("No routes available");
     }
   };
 

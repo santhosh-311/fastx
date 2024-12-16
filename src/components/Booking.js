@@ -11,7 +11,7 @@ import ViewTicket from "./ViewTicket";
 
 const Booking=()=>{
 
-    const {userDetails,token}=useContext(DataContext);
+    const {userDetails,token,BASE_URL}=useContext(DataContext);
     const [bookings,setBookings]=useState([])
     const [activeTab, setActiveTab] = useState("current");
 

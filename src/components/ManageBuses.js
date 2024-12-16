@@ -22,28 +22,36 @@ const ManageBuses = () => {
     const nav = useNavigate();
   
     const BASE_URL = "http://localhost:8084/"; 
-  
+
     useEffect(() => {
-      const fetchBusDetails = async () => {
-        try {
-          const response = await axios.get(`${BASE_URL}bus/op/getbus/${userDetails.userName}`, {
-            headers: { Authorization: `Bearer ${userDetails.jwt}` },
-          });
-          const currentDate = new Date();
-          const filtered = response.data.filter((bus) => {
-            const journeyDate = new Date(bus.date);
-            return currentTab === "current"
-              ? journeyDate >= currentDate 
-              : journeyDate < currentDate; 
-          });
-          setBusData(filtered);
-          setFilteredData(filtered); 
-        } catch (err) {
-          message.error("Error fetching bus details");
-        }
-      };
+      
+      fetchBusDetails();
+    }, []);
+
+    useEffect(() => {
       fetchBusDetails();
     }, [currentTab]);
+
+
+
+    const fetchBusDetails = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}bus/op/getbus/${userDetails.userName}`, {
+          headers: { Authorization: `Bearer ${userDetails.jwt}` },
+        });
+        const currentDate = new Date();
+        const filtered = response.data.filter((bus) => {
+          const journeyDate = new Date(bus.date);
+          return currentTab === "current"
+            ? journeyDate >= currentDate 
+            : journeyDate < currentDate; 
+        });
+        setBusData(filtered);
+        setFilteredData(filtered); 
+      } catch (err) {
+        message.error("Error fetching bus details");
+      }
+    };
     
   
     const handleSearch = (value) => {
@@ -101,6 +109,7 @@ const ManageBuses = () => {
         } catch (error) {
           message.error("Failed to add or update bus. Please try again.");
         }
+        fetchBusDetails();
       };
       
   
@@ -140,6 +149,7 @@ const ManageBuses = () => {
           message.error("Failed to delete bus.");
         }
         console.log("in handle delete")
+        fetchBusDetails();
       };
   
     const columns = [

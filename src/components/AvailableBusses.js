@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/AvailableBuses.css';
 import { Card, Button, Tag, Row, Col,Typography, message } from "antd";
 import { EnvironmentOutlined, CalendarOutlined, ClockCircleOutlined, UserOutlined } from "@ant-design/icons";
@@ -13,8 +13,12 @@ const { Title} = Typography;
 
 const AvailableBusses=()=> {
   const nav =useNavigate();
-  const {buses,userDetails,token} =useContext(DataContext);
-
+  const {buses,userDetails,token,searchFlag,setBuses,setSearchFlag} =useContext(DataContext);
+  
+  useEffect(()=>{
+    setBuses([]);
+    setSearchFlag(false);
+  },[])
   const showbuses=(bus)=>{
     if(token===""){
       message.error("Please login")
@@ -87,7 +91,7 @@ const AvailableBusses=()=> {
       </Row>
     </Card>
           </Col>
-        )):null}
+        )):searchFlag?<h2>No buses Available</h2>:<h2>Search to view buses</h2>}
       </Row>
     </section>
   );

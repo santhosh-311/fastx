@@ -4,10 +4,10 @@ const DataContext = createContext({});
 
 export const DataProvider = ({children})=>{
     const [buses,setBuses]=useState([]);
-    const availablebuses=(busList)=>{
-        console.log("Available Buses:",busList)
-        setBuses(busList);
-    }
+    // const availablebuses=(busList)=>{
+    //     console.log("Available Buses:",busList)
+    //     setBuses(busList);
+    // }
     const [userDetails,setUserDetails]=useState("");
     const [token,setToken]=useState("");
 
@@ -22,10 +22,12 @@ export const DataProvider = ({children})=>{
     const [opFlag,setOpFlag]=useState(false);
     const [adminFlag,setAdminFlag]=useState(false);
     const [bookingDetails,setBookingDetails]=useState([]);
+    const [searchFlag,setSearchFlag]= useState(false);
+    const [BASE_URL,setBASE_URL]=useState("http://localhost:8084")
 
     return(
         <DataContext.Provider value={{
-            buses,availablebuses,
+            buses,setBuses,
             userDetails,setUserDetails,token,setToken,
             loginFlag,setLoginFlag,
             signupFlag,setSignupFlag,
@@ -35,7 +37,9 @@ export const DataProvider = ({children})=>{
             routesFrom,setRoutesFrom,
             routesTo,setRoutesTo,
             forgetFlag,setForgetFlag,
-            bookingDetails,setBookingDetails
+            bookingDetails,setBookingDetails,
+            BASE_URL,
+            searchFlag,setSearchFlag
         }}>
             {children}
             </DataContext.Provider>
