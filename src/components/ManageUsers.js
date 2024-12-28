@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Table, Button, Input, message, Switch, Popconfirm } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined,EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import axios from "axios";
 import DataContext from "./context/DataContext";
 import Footer from "./Footer";
@@ -20,6 +20,7 @@ const ManageUsers = () => {
         // const endpoint = isUserMode ? "users" : "operators"; // Example endpoints
         const response = await axios.get(`${BASE_URL}user/admin/allusers`,{headers: { Authorization: `Bearer ${token}`},});
         isUserMode?setData(response.data.filter((user)=>user.roles==="USER")):setData(response.data.filter((user)=>user.roles==="OPERATOR"))
+        console.log(response.data)
       } catch (err) {
         message.error("Error fetching data");
       }
@@ -41,13 +42,17 @@ const ManageUsers = () => {
     }
   };
 
+  const lastBooking=(id)=>{
+    
+  }
+
   const columns = isUserMode
     ? [
         { title: "Name", dataIndex: "name", key: "name" },
         { title: "Email", dataIndex: "email", key: "email" },
         { title: "Number", dataIndex: "number", key: "number" },
         {
-          title: "Actions",
+          title: "Delete",
           key: "actions",
           render: (_, record) => (
             <Popconfirm
@@ -62,6 +67,27 @@ const ManageUsers = () => {
                 danger
               />
             </Popconfirm>
+          ),
+        },
+        {
+          title: "Last booking",
+          key: "actions",
+          render: (record) => (
+            // <Popconfirm
+            //   title="Are you sure to delete this user?"
+            //   onConfirm={() => handleDelete(record.email)}
+            //   okText="Yes"
+            //   cancelText="No"
+            // >
+              <Button
+                type="link"
+                icon={<EyeTwoTone/>}
+                onClick={()=>console.log(data[0].userId)}
+                // iconRender={(visible) =>
+                //   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                // }
+                />
+            // </Popconfirm>
           ),
         },
       ]

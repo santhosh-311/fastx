@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Typography, List, Divider } from "antd";
 import { Layout, Menu, Row, Col, Input, Button, Radio, Spin, message } from "antd";
 import { EnvironmentOutlined, UserOutlined, CreditCardOutlined, QrcodeOutlined } from "@ant-design/icons";
@@ -18,23 +18,44 @@ const { Content } = Layout;
 const Payment = () => {
     const location = useLocation();
     const [seatInfo, setSeatInfo] = useState(location.state?.selectedSeats || null);
+    const [userName, setUserName] = useState(location.state?.userName || null);
+    const [busId, setBusId] = useState(location.state?.busId || null);
+    const [bus,setBus]=useState(location.state?.busDetails || null);
     const [paymentMethod, setPaymentMethod] = useState("upi");
     const [loading, setLoading] = useState(false);
     const [inputData, setInputData] = useState({});
     const navigate = useNavigate();
-    const { bookingDetails, token } = useContext(DataContext);
+    const {token} = useContext(DataContext);
+    const journeyDate=location.state?.busDetails.date;
 
-    if (!bookingDetails) {
-        return <div>Loading...</div>;
-    }
+    
 
-    const { bookingId, bus, journeyDate } = bookingDetails;
+    // useEffect(()=>{
+    //     console.log("payment page",bus)
+    //     },[])
 
     const handleInputChange = (field, value) => {
         setInputData({ ...inputData, [field]: value });
     };
 
-    const handlePayment = () => {
+    const handleBooking=()=>{
+        console.log(seatInfo)
+        axios.post(`http://localhost:8084/booking/user/create/${userName}/${busId}`, {seatInfo:seatInfo.join(",")}, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then((response) => {
+                console.log(response.data)
+                handlePayment(response.data.bookingId);
+                message.success("Seats booked successfully!");
+            })
+            .catch(error => {
+                message.error("Error while booking seats.");
+                console.error("Booking error:", error);
+            });
+        
+    }
+
+    const handlePayment = (bookingId) => {
         setLoading(true);
         console.log(total)
         axios.post(`http://localhost:8084/payment/process/${bookingId}/${parseFloat(total)}`,{}, {
@@ -56,8 +77,8 @@ const Payment = () => {
             });
     };
 
-    const tax = seatInfo.length * bus.pricePerSeat * 0.18;
-    const total = seatInfo.length * bus.pricePerSeat * 1.18;
+    const tax = seatInfo.length * bus.pricePerSeat * 0.03;
+    const total = seatInfo.length * bus.pricePerSeat * 1.03;
 
     return (
         <>
@@ -166,7 +187,7 @@ const Payment = () => {
                                 <strong>Total Amount:</strong> ₹{total.toFixed(2)}
                                     <Button
                                         type="primary"
-                                        onClick={handlePayment}
+                                        onClick={handleBooking}
                                     >
                                         Verify & Pay
                                     </Button>    

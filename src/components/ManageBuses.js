@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Select,Form,Modal,Table, Button, Tabs, Input, message } from "antd";
+import { Select,Form,Modal,Table, Button, Tabs, Input, message,AutoComplete } from "antd";
 import axios from "axios";
 import DataContext from "./context/DataContext";
 import { useNavigate} from "react-router-dom";
@@ -7,7 +7,7 @@ import Header from './Header'
 import Footer from './Footer';
 
 const ManageBuses = () => {
-    const { userDetails } = useContext(DataContext);
+    const {routesFrom,setRoutesFrom,routesTo,setRoutesTo, userDetails } = useContext(DataContext);
     const [currentTab, setCurrentTab] = useState("current"); 
     const [busData, setBusData] = useState([]); 
     const [filteredData, setFilteredData] = useState([]); 
@@ -20,6 +20,8 @@ const ManageBuses = () => {
     const {Option}= Select
     const [routeForm] = Form.useForm(); 
     const nav = useNavigate();
+    const [sourceOptions, setSourceOptions] = useState([]);
+    const [destinationOptions, setDestinationOptions] = useState([]);
   
     const BASE_URL = "http://localhost:8084/"; 
 
@@ -42,6 +44,11 @@ const ManageBuses = () => {
         const currentDate = new Date();
         const filtered = response.data.filter((bus) => {
           const journeyDate = new Date(bus.date);
+          journeyDate.setHours(0,0,0,0);
+          currentDate.setHours(0,0,0,0)
+          // console.log(bus)
+          // console.log(journeyDate);
+          // console.log(currentDate);
           return currentTab === "current"
             ? journeyDate >= currentDate 
             : journeyDate < currentDate; 
@@ -51,6 +58,20 @@ const ManageBuses = () => {
       } catch (err) {
         message.error("Error fetching bus details");
       }
+    };
+
+    const handleSourceChange = (value) => {
+      const filteredOptions = routesFrom.filter((route) =>
+        route.toLowerCase().includes(value.toLowerCase())
+      );
+      setSourceOptions(filteredOptions.map((route) => ({ value: route })));
+    };
+  
+    const handleDestinationChange = (value) => {
+      const filteredOptions = routesTo.filter((route) =>
+        route.toLowerCase().includes(value.toLowerCase())
+      );
+      setDestinationOptions(filteredOptions.map((route) => ({ value: route })));
     };
     
   
@@ -268,12 +289,32 @@ const ManageBuses = () => {
           </Form.Item>
           </Form>
           <Form layout="vertical" form={routeForm}>
-            <Form.Item label="Source" name="routeFrom" rules={[{ required: true }]}>
-              <Input placeholder="Enter Source" />
-            </Form.Item>
-            <Form.Item label="Destination" name="routeTo" rules={[{ required: true }]}>
-              <Input placeholder="Enter Destination"/>
-            </Form.Item>
+          <Form.Item
+            label="Source"
+            name="routeFrom"
+            rules={[{ required: true, message: "Please input the source!" }]}
+          >
+            <AutoComplete
+              options={sourceOptions}
+              onSearch={handleSourceChange}
+              placeholder="Source"
+              dropdownStyle={{ width: 200 }} 
+            />
+          </Form.Item>
+          <Form.Item
+            label="Destination"
+            name="routeTo"
+            rules={[
+              { required: true, message: "Please input the destination!" },
+            ]}
+          >
+            <AutoComplete
+              options={destinationOptions}
+              onSearch={handleDestinationChange}
+              placeholder="Destination" 
+              dropdownStyle={{ width: 200 }} 
+            />
+          </Form.Item>
           </Form>
         </Modal>
         <Footer />

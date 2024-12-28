@@ -63,22 +63,8 @@ const BusBooking = () => {
             return;
         }
         const userName = userDetails.userName;
-        console.log(userName)
-        console.log(token);
-        console.log(selectedSeats.join(","))
-        axios.post(`http://localhost:8084/booking/user/create/${userName}/${busId}`, {seatInfo:selectedSeats.join(",")}, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then((response) => {
-                console.log(response.data)
-                setBookingDetails(response.data);
-                message.success("Seats booked successfully!");
-                nav('/payment', { state: { selectedSeats,userName, busId } });
-            })
-            .catch(error => {
-                message.error("Error while booking seats.");
-                console.error("Booking error:", error);
-            });
+        console.log("handleBooking",busDetails);
+        nav('/payment',{state: {selectedSeats,userName,busId,busDetails}});
     };
 
     const handleBlocking= async ()=>{
@@ -199,8 +185,8 @@ const BusBooking = () => {
     if (!busDetails) return <div className="loading">Loading bus details...</div>;
 
     const { route, busName, busType, busNumber, pricePerSeat } = busDetails;
-    const tax = selectedSeats.length * pricePerSeat * 0.18;
-    const total = selectedSeats.length * pricePerSeat * 1.18;
+    const tax = selectedSeats.length * pricePerSeat * 0.03;
+    const total = selectedSeats.length * pricePerSeat * 1.03;
 
     return (
         <>
