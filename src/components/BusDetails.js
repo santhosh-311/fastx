@@ -23,10 +23,12 @@ const BusDetails = () => {
             headers: { Authorization: `Bearer ${userDetails.jwt} `},
           })
             const currentDate = new Date();
+            currentDate.setHours(0,0,0,0);
             console.log("Operator Bus Details",response.data)
 
         const filtered = response.data.filter((bus) => {
           const journeyDate = new Date(bus.date);
+          journeyDate.setHours(0,0,0,0);
           return currentTab === "current"
             ? journeyDate >= currentDate 
             : journeyDate < currentDate; 
@@ -112,7 +114,7 @@ const BusDetails = () => {
       />
       </div>
 
-      <Table columns={columns} dataSource={filteredData} rowKey="id" />
+      <Table columns={columns} dataSource={filteredData} rowKey="id" pagination={false} />
     </div>
     <Footer/>
     </>

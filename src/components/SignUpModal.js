@@ -1,7 +1,9 @@
 import React, { useContext, useState,useEffect } from "react";
-import { Typography,message, Modal, Button, Input, DatePicker, Radio, Form} from "antd";
+import { Typography,message, Modal, Button, Input, DatePicker, Radio, Form, Tooltip} from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import DataContext from "./context/DataContext";
 import axios from "axios";
+import moment from 'moment';
 
 
 // const { Text } = Typography;
@@ -155,12 +157,37 @@ return (
                 </Form.Item>
 
                 <Form.Item
-                  label="Password"
+                  label={
+                    <span>
+                      Password&nbsp;
+                      <Tooltip
+                        title={
+                          <>
+                            Password must contain at least:
+                            <br /> - 1 uppercase letter
+                            <br /> - 1 lowercase letter
+                            <br /> - 1 number
+                            <br /> - 1 special character
+                            <br /> - Must be at least 8 characters long
+                          </>
+                        }
+                      >
+                        <InfoCircleOutlined />
+                      </Tooltip>
+                    </span>
+                  }
                   name="password"
-                  rules={[{ required: true, message: "Please enter your password" }]}
+                  rules={[
+                    { required: true, message: "Please enter your password" },
+                    {
+                      pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                      message: "Your password does not meet the requirements.",
+                    },
+                  ]}
                 >
                   <Input.Password disabled={isVerified} placeholder="Enter your password" />
                 </Form.Item>
+
 
                 <Form.Item
                   label="Phone Number"
@@ -183,8 +210,20 @@ return (
                     { required: true, message: "Please select your date of birth" },
                   ]}
                 >
-                  <DatePicker disabled={isVerified} style={{ width: "100%" }} />
+                  <DatePicker
+                    disabled={isVerified}
+                    style={{ width: "100%" }}
+                    disabledDate={(current) => {
+                      if (!current) return false; 
+                      const today = moment(); 
+                      const minDate = today.clone().subtract(80, "years").startOf("day");
+                      const maxDate = today.clone().subtract(18, "years").endOf("day");
+                      
+                      return current.isBefore(minDate) || current.isAfter(maxDate);
+                    }}
+                  />
                 </Form.Item>
+
 
                 <Form.Item
                   label="Gender"

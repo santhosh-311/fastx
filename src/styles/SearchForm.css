@@ -57,12 +57,12 @@
 .formContainer .ant-select-selector{
   height: 70px !important;
   border-radius: 0 !important;
+  padding-left: 20px !important;
 }
 
 .formContainer .ant-select-selection-placeholder{
   color: #6d6d6d !important;
   font-weight: 500;
-  padding-left: 5px !important;
 }
 
 .formContainer .corner .ant-select-selector{

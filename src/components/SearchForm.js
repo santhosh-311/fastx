@@ -1,52 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { Form, DatePicker, Select, Button, AutoComplete } from 'antd';
-import '../styles/SearchForm.css';
-import axios from 'axios';
-import {SearchOutlined} from '@ant-design/icons'
-import { useContext } from 'react';
-import DataContext from './context/DataContext';
-import moment from 'moment';
-
+import React, { useEffect, useState } from "react";
+import { Form, DatePicker, Select, Button, AutoComplete } from "antd";
+import "../styles/SearchForm.css";
+import axios from "axios";
+import { SwapOutlined, SearchOutlined } from "@ant-design/icons";
+import { useContext } from "react";
+import DataContext from "./context/DataContext";
+import moment from "moment";
 
 const { Option } = Select;
 
-const SearchForm=()=> {
-  const {routesFrom,setRoutesFrom,routesTo,setRoutesTo,setBuses,setSearchFlag} =useContext(DataContext)
+const SearchForm = () => {
+  const { routesFrom, setRoutesFrom, routesTo, setRoutesTo, setBuses, setSearchFlag } = useContext(DataContext);
   const [form] = Form.useForm();
   const [sourceOptions, setSourceOptions] = useState([]);
   const [destinationOptions, setDestinationOptions] = useState([]);
 
-  // const [routesFrom,setRoutesFrom] =useState([])
-  // const [routesTo,setRoutesTo] =useState([])
-
-
   const BASE_URL = "http://localhost:8084/";
 
-useEffect(() => {
-  const fetchRoutes = async () => {
-    try {
-      const res = await axios.get(BASE_URL + "route/getall");
-      const routesData = res.data;
-      // console.log("Routes", routesData);
-      const routesFromData = [...new Set(routesData.map((r) => r.routeFrom))];
-      const routesToData = [...new Set(routesData.map((r) => r.routeTo))];
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const res = await axios.get(BASE_URL + "route/getall");
+        const routesData = res.data;
+        const routesFromData = [...new Set(routesData.map((r) => r.routeFrom))];
+        const routesToData = [...new Set(routesData.map((r) => r.routeTo))];
 
+        setRoutesFrom(routesFromData);
+        setRoutesTo(routesToData);
+      } catch (err) {
+        console.error("Error during route loading:", err);
+      }
+    };
 
-      setRoutesFrom(routesFromData);
-      setRoutesTo(routesToData);
-
-      // console.log("Routes from size", routesFromData.length, "those routes", routesFromData);
-      // console.log("Routes to size", routesToData.length, "those routes", routesToData);
-    } catch (err) {
-      console.error("Error during route loading:", err);
-    }
-  };
-
-  fetchRoutes();
-}, []);
-
-
-
+    fetchRoutes();
+  }, []);
 
   const handleSourceChange = (value) => {
     const filteredOptions = routesFrom.filter((route) =>
@@ -62,22 +49,30 @@ useEffect(() => {
     setDestinationOptions(filteredOptions.map((route) => ({ value: route })));
   };
 
-  const onFinish = (values) => {
-    console.log("Received values:", values);
-    const newValues={...values,date:values.date.format("YYYY-MM-DD")};
-    const {source,destination,date,type}=newValues;
-    const getBuses= async ()=>{
-      try{
-        const response = await axios.get(BASE_URL+`bus/searchbus/${source}/${destination}/${date}/${type}`);
+  const handleSwap = () => {
+    const source = form.getFieldValue("source");
+    const destination = form.getFieldValue("destination");
 
-        // let buses=response.data;
-        setBuses(response.data)
+    form.setFieldsValue({
+      source: destination,
+      destination: source,
+    });
+  };
+
+  const onFinish = (values) => {
+    const newValues = { ...values, date: values.date.format("YYYY-MM-DD") };
+    const { source, destination, date, type } = newValues;
+    const getBuses = async () => {
+      try {
+        const response = await axios.get(
+          `${BASE_URL}bus/searchbus/${source}/${destination}/${date}/${type}`
+        );
+        setBuses(response.data);
+      } catch (err) {
+        setBuses([]);
+        console.error("Error during bus fetch:", err);
       }
-      catch(err){
-        setBuses([])
-        console.log("error during bus fetch",err);
-      }
-    }
+    };
     setSearchFlag(true);
     getBuses();
   };
@@ -101,10 +96,18 @@ useEffect(() => {
               options={sourceOptions}
               onSearch={handleSourceChange}
               placeholder="Source"
-              style={{ width: 200 }} 
-              dropdownStyle={{ width: 200 }} 
+              style={{ width: 200 }}
             />
           </Form.Item>
+          <div style={{ display: "flex", alignItems: "center", margin: "0 10px", position:"absolute", top:"20px", left:"150px", zIndex:"2" }}>
+            <Button
+              type="default"
+              shape="circle"
+              icon={<SwapOutlined />}
+              onClick={handleSwap}
+              style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+            />
+          </div>
           <Form.Item
             name="destination"
             rules={[
@@ -112,12 +115,10 @@ useEffect(() => {
             ]}
           >
             <AutoComplete
-              className="ip"
+              className="ip dest"
               options={destinationOptions}
               onSearch={handleDestinationChange}
               placeholder="Destination"
-              style={{ width: 200 }} 
-              dropdownStyle={{ width: 200 }} 
             />
           </Form.Item>
           <Form.Item
@@ -127,10 +128,9 @@ useEffect(() => {
             <DatePicker
               className="ip"
               style={{ width: 200 }}
-              disabledDate={(current) => current && current < moment().startOf('day')}
+              disabledDate={(current) => current && current < moment().startOf("day")}
             />
           </Form.Item>
-
           <Form.Item
             name="type"
             rules={[{ required: true, message: "Please select the bus type!" }]}
@@ -143,12 +143,18 @@ useEffect(() => {
             </Select>
           </Form.Item>
           <Form.Item>
-          <Button className="search-btn" type="primary" htmlType="submit"><SearchOutlined className='search-icon' /> </Button>
-        </Form.Item>
+            <Button
+              className="search-btn"
+              type="primary"
+              htmlType="submit"
+            >
+              <SearchOutlined className="search-icon" />
+            </Button>
+          </Form.Item>
         </div>
       </Form>
     </div>
   );
-}
+};
 
 export default SearchForm;

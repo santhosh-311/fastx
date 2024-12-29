@@ -155,7 +155,7 @@ const ViewTicket = ({ bookingId,refreshBookings }) => {
           </Descriptions>
           {userDetails.role === "USER" ? (
             <Button
-              disabled={details?.bookingStatus !== "confirmed"}
+              disabled={details?.bookingStatus !== "confirmed" || new Date(details.bus.date) <= new Date()}
               key="cancel ticket"
               onClick={() => cancelTicket(details?.bookingId)}
               type="primary"
@@ -166,7 +166,7 @@ const ViewTicket = ({ bookingId,refreshBookings }) => {
           ) : userDetails.role === "OPERATOR" ? (
             details?.bookingStatus !== "Refund Pending" && details?.bookingStatus !== "Refunded" ? (
               <Button
-                disabled={details?.bookingStatus === "Cancelled"}
+                disabled={details?.bookingStatus === "Cancelled" || new Date(details.bus.date) <= new Date()}
                 type="primary"
                 onClick={() => cancelBooking(details?.bookingId)}
               >
@@ -174,7 +174,7 @@ const ViewTicket = ({ bookingId,refreshBookings }) => {
               </Button>
             ) : (
               <Button
-                disabled={details.bookingStatus === "Refunded"}
+                disabled={details.bookingStatus === "Refunded" || new Date(details.bus.date) <= new Date()}
                 onClick={() => refundProcess(details?.bookingId, details?.payment.paymentId)}
                 key="refund"
                 type="primary"

@@ -46,12 +46,21 @@ const ManageBookings = () => {
 
     const filterBookings = (type) => {
         const now = new Date();
-        if (type === "current") {
-            return bookings.filter((b) => new Date(b.journeyDate) >= now );
-        } else if (type === "past") {
-            return bookings.filter((b) => new Date(b.journeyDate) < now && b.journeyDate !== null);
-        }
+        now.setHours(0, 0, 0, 0); // Reset to start of the current day
+    
+        return bookings.filter((b) => {
+            const busDate = new Date(b.journeyDate);
+            busDate.setHours(0, 0, 0, 0); // Reset to start of the booking's journey date
+    
+            if (type === "current") {
+                return busDate >= now; // Current or future bookings
+            } else if (type === "past") {
+                return busDate < now; // Past bookings
+            }
+            return false; // If no valid type is provided
+        });
     };
+    
 
     const currentBookings = filterBookings("current");
     const pastBookings = filterBookings("past");

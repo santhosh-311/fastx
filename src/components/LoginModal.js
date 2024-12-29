@@ -80,15 +80,6 @@ const LoginModal = ({login}) => {
         >
           Sign In
         </Button>
-        <Divider>OR</Divider>
-        <Button
-          icon={<GoogleOutlined />}
-          type="default"
-          block
-          style={{ marginTop: 10 }}
-        >
-          Sign in with Google
-        </Button>
         <div style={{ fontSize: 12, marginTop: 15, textAlign: "center" }}>
           By signing in or creating an account, you are agreeing to our{" "}
           <a href="/terms-and-conditions">Terms & Conditions</a> and our{" "}

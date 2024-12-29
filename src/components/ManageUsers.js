@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Table, Button, Input, message, Switch, Popconfirm } from "antd";
-import { DeleteOutlined,EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 import DataContext from "./context/DataContext";
 import Footer from "./Footer";
 import Header from "./Header";
+import LastBooking from "./LastBooking";
 
 const ManageUsers = () => {
-    const{token,userDetails}=useContext(DataContext);
+    const{token}=useContext(DataContext);
   const [isUserMode, setIsUserMode] = useState(true); 
   const [data, setData] = useState([]); 
   const [searchValue, setSearchValue] = useState(""); 
@@ -17,7 +18,6 @@ const ManageUsers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const endpoint = isUserMode ? "users" : "operators"; // Example endpoints
         const response = await axios.get(`${BASE_URL}user/admin/allusers`,{headers: { Authorization: `Bearer ${token}`},});
         isUserMode?setData(response.data.filter((user)=>user.roles==="USER")):setData(response.data.filter((user)=>user.roles==="OPERATOR"))
         console.log(response.data)
@@ -42,19 +42,16 @@ const ManageUsers = () => {
     }
   };
 
-  const lastBooking=(id)=>{
-    
-  }
-
   const columns = isUserMode
     ? [
         { title: "Name", dataIndex: "name", key: "name" },
         { title: "Email", dataIndex: "email", key: "email" },
         { title: "Number", dataIndex: "number", key: "number" },
         {
-          title: "Delete",
+          title: "Actions",
           key: "actions",
           render: (_, record) => (
+            <>
             <Popconfirm
               title="Are you sure to delete this user?"
               onConfirm={() => handleDelete(record.email)}
@@ -67,27 +64,8 @@ const ManageUsers = () => {
                 danger
               />
             </Popconfirm>
-          ),
-        },
-        {
-          title: "Last booking",
-          key: "actions",
-          render: (record) => (
-            // <Popconfirm
-            //   title="Are you sure to delete this user?"
-            //   onConfirm={() => handleDelete(record.email)}
-            //   okText="Yes"
-            //   cancelText="No"
-            // >
-              <Button
-                type="link"
-                icon={<EyeTwoTone/>}
-                onClick={()=>console.log(data[0].userId)}
-                // iconRender={(visible) =>
-                //   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                // }
-                />
-            // </Popconfirm>
+            <LastBooking id={record.userId}/>
+            </>
           ),
         },
       ]
@@ -142,6 +120,7 @@ const ManageUsers = () => {
         )
     }
         rowKey="id"
+        pagination={false}
       />
     </div>
     <Footer/>

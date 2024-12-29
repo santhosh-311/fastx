@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/AvailableBuses.css';
 import { Card, Button, Tag, Row, Col,Typography, message } from "antd";
-import { EnvironmentOutlined, CalendarOutlined, ClockCircleOutlined, UserOutlined } from "@ant-design/icons";
+import { EnvironmentOutlined, CalendarOutlined, ClockCircleOutlined, UserOutlined, FrownOutlined } from "@ant-design/icons";
 import { useContext } from 'react';
 import DataContext from './context/DataContext';
 import { useNavigate } from 'react-router-dom';
@@ -91,7 +91,12 @@ const AvailableBusses=()=> {
       </Row>
     </Card>
           </Col>
-        )):searchFlag?<h2>No buses Available</h2>:<h2>Search to view buses</h2>}
+        )):searchFlag?
+          <div style={{display:"flex", flexDirection:"column", margin:"auto", justifyContent:"center", alignItems:"center"}}>
+              <FrownOutlined style={{color:"#1890ff", fontWeight:"700", fontSize:"50px"}}/>
+              <h2 style={{color:"#777"}}>No buses Available</h2>
+          </div>
+          :<h2 style={{margin:"auto"}}>Search to view buses</h2>}
       </Row>
     </section>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Select,Form,Modal,Table, Button, Tabs, Input, message,AutoComplete } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import axios from "axios";
 import DataContext from "./context/DataContext";
 import { useNavigate} from "react-router-dom";
@@ -45,7 +46,7 @@ const ManageBuses = () => {
         const filtered = response.data.filter((bus) => {
           const journeyDate = new Date(bus.date);
           journeyDate.setHours(0,0,0,0);
-          currentDate.setHours(0,0,0,0)
+          currentDate.setHours(0,0,0,0);
           // console.log(bus)
           // console.log(journeyDate);
           // console.log(currentDate);
@@ -192,8 +193,8 @@ const ManageBuses = () => {
     {title:"Amenities",key:"amenities",dataIndex:"amenities"},
       { title: "Actions", key: "actions", render: (_, record) => (
         <>
-          <Button type="link" onClick={() => handleEdit(record)}>Edit</Button>
-          <Button type="link" danger onClick={() => handleDelete(record.busId)}>Delete</Button>
+          <Button type="link" disabled={currentTab==="past"} icon={<EditOutlined />}  onClick={() => handleEdit(record)}/>
+          <Button type="link" disabled={currentTab==="past"} icon={<DeleteOutlined />} danger onClick={() => handleDelete(record.busId)}/>
         </>
       )},
     ];
@@ -210,9 +211,9 @@ const ManageBuses = () => {
             placeholder="Search by bus name"
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
-            style={{ width: "300px", marginBottom: "20px" }}
+            style={{ width: "300px", marginBottom: "20px", marginRight:"20px" }}
           />
-          <Button type="primary" onClick={() => setIsModalVisible(true)}>Add Bus</Button>
+          <Button type="primary" disabled={currentTab==="past"} onClick={() => setIsModalVisible(true)}>Add Bus</Button>
           <Table columns={columns} dataSource={filteredData} rowKey="busId" pagination={false} />
         </div>
         <Modal
