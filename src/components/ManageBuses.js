@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Select,Form,Modal,Table, Button, Tabs, Input, message,AutoComplete } from "antd";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { Select,Form,Modal,Table, Button, Tabs, Input, message,AutoComplete,TimePicker } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import axios from "axios";
 import DataContext from "./context/DataContext";
@@ -7,8 +9,10 @@ import { useNavigate} from "react-router-dom";
 import Header from './Header'
 import Footer from './Footer';
 
+dayjs.extend(customParseFormat);
+
 const ManageBuses = () => {
-    const {routesFrom,setRoutesFrom,routesTo,setRoutesTo, userDetails } = useContext(DataContext);
+    const {routesFrom,routesTo, userDetails } = useContext(DataContext);
     const [currentTab, setCurrentTab] = useState("current"); 
     const [busData, setBusData] = useState([]); 
     const [filteredData, setFilteredData] = useState([]); 
@@ -38,6 +42,7 @@ const ManageBuses = () => {
 
 
     const fetchBusDetails = async () => {
+      console.log("in fetching details")
       try {
         const response = await axios.get(`${BASE_URL}bus/op/getbus/${userDetails.userName}`, {
           headers: { Authorization: `Bearer ${userDetails.jwt}` },
@@ -86,7 +91,7 @@ const ManageBuses = () => {
   
     const handleOk = async () => {
         try {
-          const busValues = await form.getFieldsValue();
+          let busValues = await form.getFieldsValue();
           const routeValues = await routeForm.getFieldsValue();
       
           const routeResponse = await axios.get(`${BASE_URL}route/getall`);
@@ -100,7 +105,6 @@ const ManageBuses = () => {
             const routeId = routeExtract[0].routeId;
       
             if (isEditing) {
-              // Update bus
               await axios.put(
                 `${BASE_URL}bus/op/update/${routeId}`,
                 { busId: editingBus.busId, ...busValues },
@@ -109,8 +113,20 @@ const ManageBuses = () => {
                 }
               );
               message.success("Bus updated successfully!");
+              console.log("Bus update",busValues);
             } else {
               // Add new bus
+              const arrival = new Date(busValues.arrival.toISOString()).toTimeString().substring(0,8);
+              const departure = new Date(busValues.departure.toISOString()).toTimeString().substring(0,8);
+              const departure1=busValues.departure;
+              for(let key in departure1){
+                console.log(`${key} : ${departure1[key]}`);
+              }
+              busValues={...busValues,arrival,departure}
+              console.log("Test",departure1);
+              console.log("arrival",arrival);
+              console.log("departure", departure);
+              console.log("add bus",busValues);
               const response =await axios.post(
                 `${BASE_URL}bus/op/add/${routeId}/${userDetails.userName}`,
                 busValues,
@@ -120,7 +136,7 @@ const ManageBuses = () => {
               );
               message.success("Bus added successfully!");
               const busInfo=response.data;
-              await axios.post(`${BASE_URL}seat/op/addseats/${busInfo.busType.includes("SLEEPER")?"30":"36"}/${busInfo.busId}`,{},{
+              await axios.post(`${BASE_URL}seat/op/addseats/${"36"}/${busInfo.busId}`,{},{
                 headers: { Authorization: `Bearer ${userDetails.jwt}` },
               });
               message.success("Seats added successfully!");
@@ -136,7 +152,7 @@ const ManageBuses = () => {
       
   
     const handleEdit = (bus) => {
-      setEditingBus(bus);
+      console.log("Bus Edit:",bus)
       setIsEditing(true);
       form.setFieldsValue(bus);
       setRouteDetails(bus.route);
@@ -157,12 +173,18 @@ const ManageBuses = () => {
             title: "Are you sure you want to delete this bus?",
             onOk: async () => {
               console.log(id)
+              // const seatResponse= await axios.delete(`${BASE_URL}seat/op/removeseats/${id}`,{
+              //   headers: { Authorization: `Bearer ${userDetails.jwt} `},
+              // })
+              // message.success("Seats removed");
               const response =await axios.delete(`${BASE_URL}bus/op/delete/${id}`,{
                 headers: { Authorization: `Bearer ${userDetails.jwt} `},
               });
               console.log(response.data)
-              if(response.data.includes("Bus Deleted"))
+              if(response.data.includes("Bus Deleted")){
                 message.success("Bus deleted successfully!");
+                fetchBusDetails();
+              } 
               else
                 message.error(`Bus not deleted.Bookings are done for this bus`)
             },
@@ -171,7 +193,6 @@ const ManageBuses = () => {
           message.error("Failed to delete bus.");
         }
         console.log("in handle delete")
-        fetchBusDetails();
       };
   
     const columns = [
@@ -193,7 +214,11 @@ const ManageBuses = () => {
     {title:"Amenities",key:"amenities",dataIndex:"amenities"},
       { title: "Actions", key: "actions", render: (_, record) => (
         <>
-          <Button type="link" disabled={currentTab==="past"} icon={<EditOutlined />}  onClick={() => handleEdit(record)}/>
+          <Button type="link" disabled={currentTab==="past"} icon={<EditOutlined />}  
+            onClick={() => { 
+                setEditingBus(record);
+                handleEdit(record);
+                }}/>
           <Button type="link" disabled={currentTab==="past"} icon={<DeleteOutlined />} danger onClick={() => handleDelete(record.busId)}/>
         </>
       )},
@@ -244,14 +269,14 @@ const ManageBuses = () => {
               name="arrival"
               rules={[{ required: true, message: "Please enter arrival time.(24hrs - HH:MM:SS)" }]}
             >
-              <Input placeholder="Enter arrival time (24hrs - HH:MM:SS)" />
+              {isEditing?<Input placeholder="Enter arrival time" />:<TimePicker minuteStep={15}/>}
             </Form.Item>
             <Form.Item
               label="Departure (24hrs - HH:MM:SS)"
               name="departure"
               rules={[{ required: true, message: "Please enter departure time. (24hrs - HH:MM:SS)" }]}
             >
-              <Input placeholder="Enter departure time (24hrs - HH:MM:SS)" />
+              {isEditing?<Input placeholder="Enter departure time" />:<TimePicker minuteStep={15}/>}
             </Form.Item>
             <Form.Item
                   label="Date (YYYY-MM-DD)"

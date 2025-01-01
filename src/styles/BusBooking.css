@@ -55,31 +55,31 @@
     gap: 20px;
 }
 
-.seat-layout {
-    flex: 3;
+.seat-layout-container{
+    flex:3;
     background-color: #fff;
     border: 1px solid #ddd;
-    padding: 15px;
     border-radius: 8px;
+    padding: 15px;
 }
 
 .seat-row {
     display: flex;
     justify-content: center;
-    margin: 5px 0;
+    /* background-color: red; */
 }
 
 .seat {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     margin: 5px;
     text-align: center;
-    line-height: 40px;
+    line-height: 30px;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
     background-color: #fff;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .seat.booked {
@@ -103,9 +103,9 @@
 }
 
 .seat-spacer {
-    width: 40px;
-    height: 40px;
-    margin: 5px;
+    width: 20px;
+    height: 20px;
+    margin: 5px 0;
 }
 
 .drivers-seat {
@@ -117,8 +117,24 @@
     margin: 5px;
 }
 
+.sleeper-layout{
+    /* background-color: red; */
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.sleeper{
+    height: 50px;
+}
+
+.deck h3{
+    color: #555;
+    text-align: center;
+}
+
 .ticket-summary {
     flex: 1;
+    /* flex-basis: 40%; */
     background-color: #fff;
     padding: 15px;
     border: 1px solid #ddd;
@@ -153,13 +169,12 @@
 
 .seat-info{
     display: flex;
-    flex-direction: column;
 }
 
 .box {
     display: inline-block;
-    width: 30px; 
-    height: 30px;
+    width: 20px; 
+    height: 20px;
     margin-right: 5px; 
     border: 1px solid rgb(159, 159, 159);
     border-radius: 5px;

@@ -10,30 +10,30 @@ import moment from "moment";
 const { Option } = Select;
 
 const SearchForm = () => {
-  const { routesFrom, setRoutesFrom, routesTo, setRoutesTo, setBuses, setSearchFlag } = useContext(DataContext);
+  const { routesFrom, routesTo, setBuses, setSearchFlag } = useContext(DataContext);
   const [form] = Form.useForm();
   const [sourceOptions, setSourceOptions] = useState([]);
   const [destinationOptions, setDestinationOptions] = useState([]);
 
   const BASE_URL = "http://localhost:8084/";
 
-  useEffect(() => {
-    const fetchRoutes = async () => {
-      try {
-        const res = await axios.get(BASE_URL + "route/getall");
-        const routesData = res.data;
-        const routesFromData = [...new Set(routesData.map((r) => r.routeFrom))];
-        const routesToData = [...new Set(routesData.map((r) => r.routeTo))];
+  // useEffect(() => {
+  //   const fetchRoutes = async () => {
+  //     try {
+  //       const res = await axios.get(BASE_URL + "route/getall");
+  //       const routesData = res.data;
+  //       const routesFromData = [...new Set(routesData.map((r) => r.routeFrom))];
+  //       const routesToData = [...new Set(routesData.map((r) => r.routeTo))];
 
-        setRoutesFrom(routesFromData);
-        setRoutesTo(routesToData);
-      } catch (err) {
-        console.error("Error during route loading:", err);
-      }
-    };
+  //       setRoutesFrom(routesFromData);
+  //       setRoutesTo(routesToData);
+  //     } catch (err) {
+  //       console.error("Error during route loading:", err);
+  //     }
+  //   };
 
-    fetchRoutes();
-  }, []);
+  //   fetchRoutes();
+  // }, []);
 
   const handleSourceChange = (value) => {
     const filteredOptions = routesFrom.filter((route) =>
